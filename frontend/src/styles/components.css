@@ -1,0 +1,241 @@
+/* Component Styles */
+
+/* Stock Card */
+.stock-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stock-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.decision {
+  border-left: 4px solid;
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.decision h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.score {
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.metrics {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.metric {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.metric label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.metric span {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.explanation {
+  background: #f0f7ff;
+  padding: 1rem;
+  border-radius: 4px;
+  border-left: 4px solid #667eea;
+}
+
+.explanation p {
+  margin: 0.5rem 0;
+  color: #444;
+}
+
+/* Confidence Meter */
+.confidence-meter {
+  margin: 1rem 0;
+}
+
+.meter-bar {
+  width: 100%;
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s;
+}
+
+.meter-label {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Risk Meter */
+.risk-meter {
+  margin: 1rem 0;
+}
+
+.risk-meter .meter-bar {
+  width: 100%;
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Score Breakdown */
+.score-breakdown {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.score-breakdown h4 {
+  margin-bottom: 1rem;
+}
+
+.score-item {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.score-item label {
+  min-width: 120px;
+  font-weight: 500;
+}
+
+.score-bar {
+  flex: 1;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s;
+}
+
+.score-item span {
+  min-width: 40px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.score-item.total {
+  padding-top: 1rem;
+  border-top: 2px solid #ddd;
+  font-size: 1.1rem;
+}
+
+.final-score {
+  color: #667eea;
+  font-size: 1.5rem;
+}
+
+/* Portfolio List */
+.portfolio-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.portfolio-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-item h3 {
+  margin: 0 0 1rem 0;
+  color: #667eea;
+}
+
+.portfolio-item p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+/* News List */
+.news-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.news-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #667eea;
+}
+
+.news-item h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.news-item p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.news-item small {
+  color: #999;
+}
