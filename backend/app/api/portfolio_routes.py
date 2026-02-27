@@ -13,14 +13,8 @@ router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
 
 # --------------------
-# redirect endpoint to avoid trailing slash issues
+# Both endpoints work - with and without trailing slash
 # --------------------
-
-@router.get("")
-async def redirect_to_portfolio():
-    """Redirect /portfolio to /portfolio/ to avoid 307 redirect issues."""
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/api/portfolio/", status_code=307)
 
 
 # --------------------

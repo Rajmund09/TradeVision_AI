@@ -36,7 +36,7 @@ export default function Navbar({ onLogout, onMenuToggle, currentPage }) {
 
         <div className="navbar-live-badge">
           <span className="live-pulse" />
-          <span>STOP</span>
+          <span>LIVE</span>
         </div>
 
         <div className="navbar-profile" onClick={() => setProfileOpen(!profileOpen)}>
@@ -190,6 +190,7 @@ export default function Navbar({ onLogout, onMenuToggle, currentPage }) {
           font-family: var(--font-display);
           font-size: 13px;
           font-weight: 600;
+        
           transition: background 0.2s;
         }
         .dropdown-item:hover { background: var(--red-dim); }

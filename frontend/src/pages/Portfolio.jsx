@@ -79,6 +79,13 @@ export default function Portfolio() {
   };
 
   useEffect(() => {
+    // Wait for auth to finish loading before fetching - check if user exists
+    if (!user) {
+      setLoading(false);
+      setHoldings([]);
+      return;
+    }
+    
     // Check if already has auth error before setting up
     if (authErrorRef.current) {
       setLoading(false);
@@ -89,7 +96,7 @@ export default function Portfolio() {
 
     // Polling every 3 seconds - check ref for auth error
     const interval = setInterval(() => {
-      if (!authErrorRef.current) {
+      if (!authErrorRef.current && user) {
         fetchPortfolioData();
       } else {
         // Stop the interval if auth error
@@ -100,7 +107,7 @@ export default function Portfolio() {
     // Listen for portfolio update event
     const handlePortfolioUpdate = (event) => {
       console.log("[Portfolio] Portfolio update event received:", event.detail);
-      if (!authErrorRef.current) {
+      if (!authErrorRef.current && user) {
         fetchPortfolioData();
       }
     };

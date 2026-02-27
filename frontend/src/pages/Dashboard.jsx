@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
 import { portfolioApi } from "../api/portfolioApi";
 import { newsApi } from "../api/newsApi";
 import { predictionApi } from "../api/predictionApi";
@@ -41,54 +42,85 @@ function Sparkline({ data, color }) {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [tick, setTick] = useState(0);
   const [portfolio, setPortfolio] = useState([]);
-  const [marketNews, setMarketNews] = useState([]); // will hold array of news articles
+  const [marketNews, setMarketNews] = useState([]);
   const [signals, setSignals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Use ref to track auth error
+  const authErrorRef = useRef(false);
 
   useEffect(() => {
     const t = setInterval(() => setTick(p => p + 1), 3000);
     return () => clearInterval(t);
   }, []);
 
-  useEffect(() => {
-    async function loadData() {
-      let p = [];
-      try {
-        const resp = await portfolioApi.getPortfolio();
-        p = resp.data || [];
-        setPortfolio(p);
-      } catch (e) {
-        console.warn("Dashboard: portfolio fetch failed", e.message);
-        // Don't reload on 401 - just log the error
-      }
-      try {
-        const n = await newsApi.getMarketNews(5);
-        // ensure we have an array
-        const data = Array.isArray(n.data) ? n.data : [];
-        setMarketNews(data);
-      } catch (e) {
-        console.warn("Dashboard: news fetch failed", e.message);
-        // Don't reload on 401 - just log the error
-        setMarketNews([]);
-      }
-      // fetch signals for first few holdings
-      if (p.length) {
-        const syms = p.slice(0, 5).map(h => h.symbol);
-        const fetched = [];
-        for (const sym of syms) {
-          try {
-            const r = await predictionApi.getPrediction(sym);
-            fetched.push(r.data);
-          } catch (_err) {
-            console.warn("signal fetch error", sym);
-          }
-        }
-        setSignals(fetched);
+  const loadData = async () => {
+    if (authErrorRef.current) return;
+    
+    let p = [];
+    try {
+      const resp = await portfolioApi.getPortfolio();
+      console.log("[Dashboard] Portfolio API Response:", resp.data);
+      p = resp.data || [];
+      setPortfolio(p);
+    } catch (e) {
+      console.warn("[Dashboard] portfolio fetch failed", e.message);
+      if (e.response && e.response.status === 401) {
+        authErrorRef.current = true;
       }
     }
+    
+    try {
+      const n = await newsApi.getMarketNews(5);
+      const data = Array.isArray(n.data) ? n.data : [];
+      setMarketNews(data);
+    } catch (e) {
+      console.warn("[Dashboard] news fetch failed", e.message);
+      setMarketNews([]);
+    }
+    
+    // fetch signals for first few holdings
+    if (p.length) {
+      const syms = p.slice(0, 5).map(h => h.symbol);
+      const fetched = [];
+      for (const sym of syms) {
+        try {
+          const r = await predictionApi.getPrediction(sym);
+          fetched.push(r.data);
+        } catch (_err) {
+          console.warn("signal fetch error", sym);
+        }
+      }
+      setSignals(fetched);
+    }
+    
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    // Wait for auth to finish loading before fetching
+    if (!user) {
+      setLoading(false);
+      setPortfolio([]);
+      return;
+    }
+    
     loadData();
-  }, []);
+
+    // Polling every 10 seconds
+    const interval = setInterval(() => {
+      if (!authErrorRef.current && user) {
+        loadData();
+      } else {
+        clearInterval(interval);
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <div className="dashboard">
@@ -291,7 +323,9 @@ export default function Dashboard() {
       <div className="card" style={{ marginTop: 24 }}>
         <div className="section-title">Latest Market News</div>
         {marketNews.length === 0 ? (
-          <div style={{ padding: 20, color: "var(--text-muted)" }}>No news available.</div>
+          <div style={{ padding: 20, color: "var(--text-muted)" }}>
+            {loading ? "Loading news..." : "No news available."}
+          </div>
         ) : (
           <ul className="news-list" style={{ listStyle: "none", padding: 0 }}>
             {marketNews.slice(0, 5).map((n, i) => (

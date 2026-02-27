@@ -1,30 +1,64 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
 import { alertApi } from "../api/alertApi";
 import AlertModal from "../components/AlertModal";
 import AlertBanner from "../components/AlertBanner";
 
 export default function Alerts() {
+  const { user } = useAuth();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  
+  // Use ref to track auth error
+  const authErrorRef = useRef(false);
 
   const fetchAlerts = async () => {
+    if (authErrorRef.current) {
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
       const resp = await alertApi.getAlerts();
+      console.log("[Alerts] API Response:", resp.data);
       setAlerts(resp.data || []);
     } catch (err) {
-      console.error("Failed to load alerts", err);
-      setError("Could not load alerts");
+      console.error("[Alerts] Failed to load alerts", err);
+      if (err.response && err.response.status === 401) {
+        authErrorRef.current = true;
+        setError("Please login to view alerts");
+      } else {
+        setError("Could not load alerts");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Wait for auth to finish loading before fetching
+    if (!user) {
+      setLoading(false);
+      setAlerts([]);
+      return;
+    }
+    
     fetchAlerts();
-  }, []);
+
+    // Polling every 5 seconds
+    const interval = setInterval(() => {
+      if (!authErrorRef.current && user) {
+        fetchAlerts();
+      } else {
+        clearInterval(interval);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleCreate = (alert) => {
     setAlerts((prev) => [...prev, alert]);
