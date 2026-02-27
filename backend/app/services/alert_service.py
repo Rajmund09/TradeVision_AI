@@ -6,8 +6,11 @@ provides the API surface and can be fleshed out later.
 
 from typing import Any, Dict, List, Optional
 from sqlalchemy.orm import Session
+import logging
 
 from ..models import Alert
+
+logger = logging.getLogger("alert_service")
 
 
 def create_alert(
@@ -32,7 +35,10 @@ def create_alert(
 
 def list_alerts(db: Session, user_id: int) -> List[Alert]:
     """Return all alerts for the given user."""
-    return db.query(Alert).filter(Alert.user_id == user_id).all()
+    logger.info(f"Fetching alerts for user_id: {user_id}")
+    alerts = db.query(Alert).filter(Alert.user_id == user_id).all()
+    logger.info(f"Alerts fetched: {alerts}")
+    return alerts
 
 
 def delete_alert(db: Session, alert_id: int, user_id: Optional[int] = None) -> bool:

@@ -22,16 +22,16 @@ export default function Alerts() {
     
     setLoading(true);
     try {
-      const resp = await alertApi.getAlerts();
+      const resp = await alertApi.getAlerts("/messages");
       console.log("[Alerts] API Response:", resp.data);
       setAlerts(resp.data || []);
     } catch (err) {
-      console.error("[Alerts] Failed to load alerts", err);
+      console.error("[Alerts] Failed to load alert messages", err);
       if (err.response && err.response.status === 401) {
         authErrorRef.current = true;
         setError("Please login to view alerts");
       } else {
-        setError("Could not load alerts");
+        setError("Could not load alert messages");
       }
     } finally {
       setLoading(false);
@@ -45,13 +45,26 @@ export default function Alerts() {
       setAlerts([]);
       return;
     }
-    
-    fetchAlerts();
+
+    const fetchAlertMessages = async () => {
+      try {
+        const resp = await alertApi.getAlerts("/messages");
+        console.log("[Alerts] API Response:", resp.data);
+        setAlerts(resp.data || []);
+      } catch (err) {
+        console.error("[Alerts] Failed to load alert messages", err);
+        setError("Could not load alert messages");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAlertMessages();
 
     // Polling every 5 seconds
     const interval = setInterval(() => {
       if (!authErrorRef.current && user) {
-        fetchAlerts();
+        fetchAlertMessages();
       } else {
         clearInterval(interval);
       }

@@ -4,6 +4,7 @@ const nav = [
   { id: "portfolio", label: "Portfolio", icon: "◉" },
   { id: "advisor", label: "AI Advisor", icon: "◎" },
   { id: "alerts", label: "Alerts", icon: "⚠️" },
+  { id: "edufin", label: "EduFin Platform", icon: "📘", link: "https://git-initeducation-intelligence-plat.vercel.app/" },
 ];
 
 const marketData = [
@@ -41,7 +42,13 @@ export default function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
           <button
             key={item.id}
             className={`nav-item ${currentPage === item.id ? "active" : ""}`}
-            onClick={() => onNavigate(item.id)}
+            onClick={() => {
+              if (item.link) {
+                window.location.href = item.link; // Open in the same tab
+              } else {
+                onNavigate(item.id);
+              }
+            }}
             title={!isOpen ? item.label : ""}
           >
             <span className="nav-icon">{item.icon}</span>

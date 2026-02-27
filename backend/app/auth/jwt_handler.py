@@ -13,6 +13,9 @@ from typing import Optional
 import os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import logging
+
+logger = logging.getLogger("jwt_handler")
 
 SECRET_KEY = os.environ.get("JWT_SECRET", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
@@ -53,10 +56,12 @@ def verify_token(token: str) -> Optional[dict]:
         dict: token payload if valid, None otherwise
     """
     try:
+        logger.info(f"Verifying token: {token}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        logger.info(f"Token payload: {payload}")
         return payload
     except JWTError as exc:
-        # In production, log this for monitoring
+        logger.error(f"Token validation failed: {exc}")
         return None
 
 

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List
+import logging
 
 from .. import database
 from ..models import Alert, User
@@ -9,6 +10,8 @@ from ..auth.jwt_handler import get_current_user
 from ..services import alert_service
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
+
+logger = logging.getLogger("alert_routes")
 
 
 class AlertItem(BaseModel):
@@ -31,6 +34,29 @@ async def list_alerts(
         raise HTTPException(status_code=404, detail="User not found")
     alerts = alert_service.list_alerts(db, user.id)
     return [AlertItem(id=a.id, symbol=a.symbol, threshold=a.threshold, direction=a.direction) for a in alerts]
+
+
+@router.get("/messages", response_model=List[dict])
+async def list_alert_messages(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(get_current_user),
+):
+    user = db.query(User).filter(User.username == current_user).first()
+    if not user:
+        logger.error(f"User not found: {current_user}")
+        raise HTTPException(status_code=404, detail="User not found")
+    alerts = alert_service.list_alerts(db, user.id)
+    logger.info(f"User ID: {user.id}, Alerts: {alerts}")
+    return [
+        {
+            "id": a.id,
+            "symbol": a.symbol,
+            "threshold": a.threshold,
+            "direction": a.direction,
+            "message": f"Alert for {a.symbol}: Price is {'above' if a.direction == 'above' else 'below'} {a.threshold}",
+        }
+        for a in alerts
+    ]
 
 
 @router.post("/")
